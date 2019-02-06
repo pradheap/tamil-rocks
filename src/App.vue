@@ -8,21 +8,33 @@
         </b-navbar-brand>
           <b-collapse is-nav id="nav_collapse">
             <b-navbar-nav>
+              <router-link to="/ngram">NGram</router-link>
+            </b-navbar-nav>
+            <b-navbar-nav>
               <b-nav-item href="/about">About</b-nav-item>
             </b-navbar-nav>
           </b-collapse>
     </b-navbar>
-    <!-- <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div> -->
-    <router-view/>
+  <router-view/>
   </div>
 </template>
 
+<script>
+export default {
+  name: 'app',
+  data() {
+    return {
+      msg: 'Welcome to Your Vue.js App',
+    };
+  },
+};
+</script>
+
 <style scoped>
+@import url('https://fonts.googleapis.com/css?family=Mukta+Malar');
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|M+PLUS+1p');
+
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
