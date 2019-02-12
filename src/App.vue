@@ -4,11 +4,11 @@
       <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
         <b-navbar-brand href="/">
           <img src="./assets/logo.png" alt="Tamil" width="56px">
-          Tamil Rocks
+          Rocks
         </b-navbar-brand>
           <b-collapse is-nav id="nav_collapse">
             <b-navbar-nav>
-              <router-link to="/ngram">NGram</router-link>
+              <router-link class="nav-link" to="/ngrams">NGrams</router-link>
             </b-navbar-nav>
             <b-navbar-nav>
               <b-nav-item href="/about">About</b-nav-item>
