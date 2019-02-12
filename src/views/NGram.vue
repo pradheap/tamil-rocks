@@ -5,10 +5,11 @@
       <InputText
           v-model="newTodoText"
           placeholder="காற்புள்ளியால் பிரித்த சொற்றடர்களை நிரப்புக"
-          @keydown.enter="addTodo"/>
+          @keydown.enter="search"/>
     </div>
     <div class="row justify-content-center">
-      <chart :chart-data="datacollection" :options="chartoptions" :width="600"/>
+      <chart v-if="showChart" :chart-data="datacollection" :options="chartoptions" :width="600"/>
+      <p v-else>Sorry, there is no sufficient data to display :(</p>
     </div>
   </div>
 </template>
@@ -18,9 +19,12 @@ import axios from 'axios';
 import InputText from '@/components/InputText.vue';
 import chart from '@/components/chart.vue';
 
+const NGRAM_API = 'http://localhost:8080/ngram';
+
 export default {
   data() {
     return {
+      showChart: true,
       newTodoText: 'வந்தியத்தேவனும் ஆழ்வார்க்கடியானும், பெரிய பழுவேட்டரையர்',
       datacollection: null,
       chartoptions: null,
@@ -44,20 +48,55 @@ export default {
       },
       scales: {
         xAxes: [{
+          gridLines: {
+            display: false,
+          },
           ticks: {
             fontSize: 14, fontFamily: "'Mukta Malar', sans-serif", fontColor: '#000', fontStyle: '400',
           },
         }],
+        yAxes: [
+          {
+            gridLines: {
+              drawBorder: false,
+            },
+          },
+        ],
       },
     };
   },
   methods: {
-    addTodo() {
+    search() {
+      if (this.newTodoText.indexOf(',') > 0) {
+        throw new Error('Only single phrase is supported now.');
+      }
       axios
-        .get('https://api.coindesk.com/v1/bpi/currentprice.json')
-        .then((res) => {
-          // eslint-disable-next-line no-console
-          console.log('Hello World!', res);
+        .post(NGRAM_API, {
+          ngrams: this.newTodoText,
+        }).then((res) => {
+          let labels = '';
+          const dataSets = [];
+          Object.keys(res.data).forEach((key) => {
+            if (!labels) {
+              labels = Object.keys(res.data[key]);
+            }
+            dataSets.push({
+              label: key,
+              data: Object.values(res.data[key]),
+              borderColor: '#78f979',
+              lineTension: 0.1,
+              fill: false,
+            });
+          });
+          if (dataSets.length === 0) {
+            this.showChart = false;
+          } else {
+            this.showChart = true;
+          }
+          this.datacollection = {
+            labels,
+            datasets: Object.values(dataSets),
+          };
         });
     },
     fillData() {
