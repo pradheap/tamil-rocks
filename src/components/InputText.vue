@@ -1,7 +1,7 @@
 <template>
   <input
     type="text"
-    class="input"
+    class="input col-md-6"
     :value="value"
     v-on="listeners"
   >
@@ -30,7 +30,6 @@ export default {
 
 <style scoped>
 .input {
-  width: 50%;
   padding: 8px 10px;
   border: 1px solid blue
 }

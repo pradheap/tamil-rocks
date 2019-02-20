@@ -1,6 +1,16 @@
 
 <template>
 <div class="container">
+  <b-alert
+      class="mt-3"
+      :show="dismissCountDown"
+      dismissible
+      variant="warning"
+      @dismissed="dismissCountDown=0"
+      @dismiss-count-down="countDownChanged"
+    >
+      <p>{{alertMsg}}</p>
+    </b-alert>
     <div class="row justify-content-center p-4">
       <InputText
           v-model="newTodoText"
@@ -24,7 +34,10 @@ const NGRAM_API = 'http://localhost:8080/ngram';
 export default {
   data() {
     return {
+      dismissSecs: 10,
+      dismissCountDown: 0,
       showChart: true,
+      alertMsg: '',
       newTodoText: 'வந்தியத்தேவனும் ஆழ்வார்க்கடியானும், பெரிய பழுவேட்டரையர்',
       datacollection: null,
       chartoptions: null,
@@ -39,7 +52,7 @@ export default {
     this.fillData();
     this.chartoptions = {
       title: {
-        text: 'Custom Chart Title',
+        text: 'Tamil Ngram Viewer',
       },
       legend: {
         labels: {
@@ -60,15 +73,28 @@ export default {
             gridLines: {
               drawBorder: false,
             },
+            ticks: {
+              callback: function(value, index, values) {
+                return `${value} %`;
+              }
+            }
           },
         ],
       },
     };
   },
   methods: {
+    countDownChanged(dismissCountDown) {
+      this.dismissCountDown = dismissCountDown;
+    },
+    showAlert(msg) {
+      this.alertMsg = msg;
+      this.dismissCountDown = this.dismissSecs;
+    },
     search() {
-      if (this.newTodoText.indexOf(',') > 0) {
-        throw new Error('Only single phrase is supported now.');
+      if (this.newTodoText.split(',').length > 3) {
+        this.showAlert('Only upto 3 phrases are supported right now.');
+        return;
       }
       axios
         .post(NGRAM_API, {
@@ -76,6 +102,9 @@ export default {
         }).then((res) => {
           let labels = '';
           const dataSets = [];
+          const colors = ['red', 'blue', 'green'];
+          let i = 0;
+
           Object.keys(res.data).forEach((key) => {
             if (!labels) {
               labels = Object.keys(res.data[key]);
@@ -83,11 +112,13 @@ export default {
             dataSets.push({
               label: key,
               data: Object.values(res.data[key]),
-              borderColor: '#78f979',
+              borderColor: colors[i],
               lineTension: 0.1,
               fill: false,
             });
+            i += 1;
           });
+          console.log(dataSets);
           if (dataSets.length === 0) {
             this.showChart = false;
           } else {
@@ -102,11 +133,11 @@ export default {
     fillData() {
       this.datacollection = {
         labels: [
-          'பொன்னியின் செல்வன் 1',
-          'பொன்னியின் செல்வன் 2',
-          'பொன்னியின் செல்வன் 3',
-          'பொன்னியின் செல்வன் 4',
-          'பொன்னியின் செல்வன் 5',
+          '1952',
+          '1953',
+          '1954',
+          '1955',
+          '1956',
         ],
         datasets: [
           {
@@ -121,7 +152,7 @@ export default {
             borderColor: '#f87979',
             fill: false,
             lineTension: 0.1,
-            data: [0.0084, 0.012, 0.01, 0.018, 0.004],
+            data: [0.0084, 0.012, 0.01, 0.008, 0.004],
           },
         ],
       };
